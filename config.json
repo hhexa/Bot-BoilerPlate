@@ -1,0 +1,14 @@
+{
+    "prefix": ".",
+    "token": "[TOKEN]",
+
+    "users": {
+
+    },
+
+    "perms": {
+        "admin": [],
+        "friend": [],
+        "banned": []
+    }
+}
