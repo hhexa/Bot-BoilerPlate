@@ -1,11 +1,11 @@
 const fs = require('fs')
 const Discord = require('discord.js')
 const config = require('./config.json')
-const { token, prefix } = config
+const token = config.keys.token
+const prefix = config.prefix
 const client = new Discord.Client()
 
-const permsUtil = require('./role.js')
-
+const util = require('./util/util')
 //False = admins are not effected by cooldowns
 const adminCD = false
 
@@ -21,10 +21,12 @@ for (const file of commandFiles) {
 //Command Cooldown
 const cooldowns = new Discord.Collection()
 
+//On Bot Login
 client.once('ready', () => {
-    console.log('ready!')
+    console.log('\nOnline')
 })
 
+//On Message
 client.on('message', message => {
     if (!message.content.startsWith(prefix) || message.author.bot)
         return
@@ -32,6 +34,7 @@ client.on('message', message => {
     const args = message.content.slice(prefix.length).split(/ +/)
     const commandName = args.shift().toLowerCase()
 
+    //Check if user places another prefix IE: '??'
     if (commandName.startsWith(prefix)) {
         console.log('command name starts with prefix\n' + commandName)
         return
@@ -46,13 +49,7 @@ client.on('message', message => {
 
     //Check if command needs arguments
     if (command.args && !args.length) {
-        let reply = `Arguments missing for command: ${command.name}`
-
-        if (command.usage) {
-            reply += `\nUsage: \`${prefix}${command.name} ${command.usage}\``
-        }
-
-        return message.reply(reply)
+        return message.reply(util.args(command))
     }
 
     //Check if guild only
@@ -61,18 +58,19 @@ client.on('message', message => {
         return
     }
 
+    //Get command perms
     const perms = command.perms
     let hasPerm = false
 
     if (perms) {
-        hasPerm = permsUtil.execute(perms, message.author.id)
+        hasPerm = util.execute(perms, message.author.id)
     }
     else if (!perms) {
         hasPerm = true
     }
 
     if (!hasPerm) {
-        console.log('You dont have permission to use this command')
+        message.channel.send('You dont have permission to use this command')
         return
     }
 
@@ -113,7 +111,6 @@ client.on('message', message => {
         message.reply('error trying to call command')
     }
 })
-
 
 //bot login
 client.login(token)
