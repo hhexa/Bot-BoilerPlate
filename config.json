@@ -1,9 +1,9 @@
 {
-    "prefix": ".",
+    "prefix": "[PREFIX]",
     "token": "[TOKEN]",
 
     "users": {
-
+        "[NAME]": "ID"
     },
 
     "perms": {
